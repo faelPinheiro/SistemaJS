@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema de Alunos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .formulario {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #mensagem {
+            text-align: center;
+            font-weight: bold;
+            min-height: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: white;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        li button {
+            background-color: #f44336;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Alunos</h1>
+
+    <div class="formulario">
+        <input type="text" id="nome" placeholder="Nome">
+        <input type="number" id="idade" placeholder="Idade">
+        <input type="text" id="matricula" placeholder="Matrícula">
+        <button onclick="cadastrar()">Cadastrar</button>
+    </div>
+
+    <p id="mensagem"></p>
+
+    <ul id="lista"></ul>
+
+    <script>
+        let alunos = [];
+
+        function mostrarMensagem(texto, cor) {
+            let mensagem = document.getElementById("mensagem");
+            mensagem.textContent = texto;
+            mensagem.style.color = cor;
+        }
+
+        function cadastrar() {
+            let campoNome = document.getElementById("nome");
+            let campoIdade = document.getElementById("idade");
+            let campoMatricula = document.getElementById("matricula");
+
+            let nome = campoNome.value.trim();
+            let idade = campoIdade.value.trim();
+            let matricula = campoMatricula.value.trim();
+
+            if (nome === "" || idade === "" || matricula === "") {
+                mostrarMensagem("Preencha todos os campos antes de cadastrar.", "red");
+                return;
+            }
+
+            let jaExiste = alunos.some(a => a.matricula === matricula);
+            if (jaExiste) {
+                mostrarMensagem("Já existe um aluno cadastrado com essa matrícula.", "red");
+                return;
+            }
+
+            alunos.push({ nome: nome, idade: idade, matricula: matricula });
+            atualizarLista();
+
+            campoNome.value = "";
+            campoIdade.value = "";
+            campoMatricula.value = "";
+            campoNome.focus();
+
+            mostrarMensagem("Aluno cadastrado com sucesso!", "green");
+        }
+
+        function remover(matricula) {
+            alunos = alunos.filter(a => a.matricula !== matricula);
+            atualizarLista();
+            mostrarMensagem("Aluno removido com sucesso!", "red");
+        }
+
+        function atualizarLista() {
+            let lista = document.getElementById("lista");
+            lista.innerHTML = "";
+
+            let alunosOrdenados = [...alunos].sort((a, b) => Number(a.matricula) - Number(b.matricula));
+            let numeroPosicao = 1;
+
+            for (let aluno of alunosOrdenados) {
+                let item = document.createElement("li");
+
+                let texto = document.createElement("span");
+                texto.textContent = numeroPosicao + " - " + aluno.nome + " | Idade: " + aluno.idade + " | Matrícula: " + aluno.matricula;
+                numeroPosicao++;
+
+                let botaoRemover = document.createElement("button");
+                botaoRemover.textContent = "Remover";
+                botaoRemover.onclick = function() { remover(aluno.matricula); };
+
+                item.appendChild(texto);
+                item.appendChild(botaoRemover);
+                lista.appendChild(item);
+            }
+        }
+    </script>
+</body>
+</html>
